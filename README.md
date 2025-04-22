@@ -13,7 +13,7 @@ The measurements obtained from sensors are:
 
 ## Getting started
 
-#### Install Docker
+### Install Docker
 [Click to install Docker](https://www.docker.com/)
 
 ### Install the project
