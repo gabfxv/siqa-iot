@@ -1,0 +1,45 @@
+services:
+  server:
+    build: .
+    deploy:
+      mode: replicated
+      replicas: 3
+    depends_on:
+      - mongo
+      - mosquitto
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+      - MONGO_DB_NAME=siqa_database
+    volumes:
+      - .:/app
+
+  mongo:
+    image: mongo:8.0
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  mosquitto:
+    image: eclipse-mosquitto:2.0.21-openssl
+    container_name: mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./certs:/mosquitto/certs
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"   # O NGINX escutará na porta 80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf  # Configuração personalizada do NGINX
+    depends_on:
+      - server
+
+volumes:
+  mongo_data:
