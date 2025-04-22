@@ -66,3 +66,17 @@ openssl req -new -key client.key -out client.csr
 openssl x509 -req -in client.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out client.crt -days 3650
 ```
 
+#### Create server secret key
+```
+touch .env
+```
+
+O arquivo .env deve ter os seguintes dados:
+
+```
+/* .env */
+
+SERVER_SECRET_KEY=<SUA SECRET KEY>
+GOOGLE_CLIENT_SECRET=<SEU GOOGLE CLIENT SECRET>
+GOOGLE_CLIENT_ID=<SEU GOOGLE CLIENT ID>
+```

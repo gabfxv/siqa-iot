@@ -10,6 +10,9 @@ services:
     environment:
       - MONGO_URI=mongodb://mongo:27017
       - MONGO_DB_NAME=siqa_database
+      - SECRET_KEY=${SERVER_SECRET_KEY}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
     volumes:
       - .:/app
 
