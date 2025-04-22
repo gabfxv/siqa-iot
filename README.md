@@ -38,3 +38,29 @@ docker-compose up --build --scale server=<number_of_replications> -d
 ## Security
 The project uses two-way authentication with TLS/SSL between the Mosquitto broker and server replicas.
 
+### Configuring the keys
+
+#### 1st step: Create certificate folder
+```
+mkdir certs
+```
+
+#### 2nd step: Create CA certificate
+```
+openssl genpkey -algorithm RSA -out ca.key -aes256
+openssl req -key ca.key -new -x509 -out ca.crt -days 3650
+```
+
+#### 3rd step: Create server certificate
+```
+openssl genpkey -algorithm RSA -out server.key -aes256
+openssl req -new -key server.key -out server.csr
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 3650
+```
+
+#### 4th step: Create client certificate
+```
+openssl genpkey -algorithm RSA -out client.key
+openssl req -new -key client.key -out client.csr
+openssl x509 -req -in client.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out client.crt -days 3650
+```
