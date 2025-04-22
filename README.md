@@ -40,25 +40,26 @@ The project uses two-way authentication with TLS/SSL between the Mosquitto broke
 
 ### Configuring the keys
 
-#### 1st step: Create certificate folder
+#### Create certificate folder
 ```
 mkdir certs
+cd ./certs
 ```
 
-#### 2nd step: Create CA certificate
+#### Create CA certificate
 ```
 openssl genpkey -algorithm RSA -out ca.key -aes256
 openssl req -key ca.key -new -x509 -out ca.crt -days 3650
 ```
 
-#### 3rd step: Create server certificate
+#### Create server certificate
 ```
 openssl genpkey -algorithm RSA -out server.key -aes256
 openssl req -new -key server.key -out server.csr
 openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 3650
 ```
 
-#### 4th step: Create client certificate
+#### Create client certificate
 ```
 openssl genpkey -algorithm RSA -out client.key
 openssl req -new -key client.key -out client.csr
