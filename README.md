@@ -33,7 +33,7 @@ docker-compose up --build --scale server=<number_of_replications> -d
 - [NGINX](https://nginx.org/)
 - [Kura](https://eclipse-kura.github.io/kura/docs-release-5.6/)
 - [Kapua](https://projects.eclipse.org/projects/iot.kapua)
-- Sensores
+- Sensors
 
 ## Security
 The project uses two-way authentication with TLS/SSL between the Mosquitto broker and server replicas.
