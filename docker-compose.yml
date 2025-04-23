@@ -13,6 +13,8 @@ services:
       - SECRET_KEY=${SERVER_SECRET_KEY}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - INITIAL_ADMIN_NAME=${INITIAL_ADMIN_NAME}
+      - INITIAL_ADMIN_GOOGLE_EMAIL=${INITIAL_ADMIN_GOOGLE_EMAIL}
     volumes:
       - .:/app
 
@@ -31,7 +33,7 @@ services:
       - "1883:1883"
       - "9001:9001"
     volumes:
-      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - ./certs:/mosquitto/certs
 
   nginx:
@@ -40,7 +42,7 @@ services:
     ports:
       - "80:80"   # O NGINX escutará na porta 80
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf  # Configuração personalizada do NGINX
+      - ./config/nginx.conf:/etc/nginx/nginx.conf  # Configuração personalizada do NGINX
     depends_on:
       - server
 

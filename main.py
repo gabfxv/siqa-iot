@@ -5,9 +5,11 @@ import os
 
 from auth.config import google_config
 from mqtt.configuration import configure_mqtt_client, mqtt_thread
+from routes.admin import admin
 from routes.auth import auth
 from routes.info import info
 from routes.mqtt import mqtt
+from utils.initial_admin import create_admin
 from utils.logging import logger
 
 def create_app():
@@ -24,9 +26,11 @@ def create_app():
     app.register_blueprint(auth)
     app.register_blueprint(mqtt)
     app.register_blueprint(info)
+    app.register_blueprint(admin)
 
     return google, app
 
+create_admin()
 google, app = create_app()
 
 def start_mqtt():
