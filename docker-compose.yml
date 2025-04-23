@@ -6,7 +6,7 @@ services:
       replicas: 3
     depends_on:
       - mongo
-      - mosquitto
+      - broker
     environment:
       - MONGO_URI=mongodb://mongo:27017
       - MONGO_DB_NAME=siqa_database
@@ -26,25 +26,71 @@ services:
     volumes:
       - mongo_data:/data/db
 
-  mosquitto:
-    image: eclipse-mosquitto:2.0.21-openssl
-    container_name: mosquitto
-    ports:
-      - "1883:1883"
-      - "9001:9001"
-    volumes:
-      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf
-      - ./certs:/mosquitto/certs
-
   nginx:
     image: nginx:alpine
     container_name: nginx
     ports:
-      - "80:80"   # O NGINX escutará na porta 80
+      - "80:80"
     volumes:
-      - ./config/nginx.conf:/etc/nginx/nginx.conf  # Configuração personalizada do NGINX
+      - ./config/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       - server
 
+  db:
+    image: kapua/kapua-sql
+    ports:
+      - "8181:8181"
+      - "3306:3306"
+
+  es:
+    image: elasticsearch:8.18.0
+    environment:
+      - cluster.name=kapua-datastore
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - transport.host=_site_
+      - transport.ping_schedule=-1
+      - transport.connect_timeout=30s
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - es-storage:/usr/share/elasticsearch/data
+
+  events-broker:
+    image: kapua/kapua-events-broker:1.6
+    ports:
+      - "5672:5672"
+
+  broker:
+    image: kapua/kapua-broker:1.6
+    ports:
+      - "1883:1883"
+    depends_on:
+      - db
+      - es
+      - events-broker
+
+  kapua-api:
+    image: kapua/kapua-api
+    ports:
+      - "8081:8080"
+    depends_on:
+      - broker
+      - db
+      - es
+      - events-broker
+
+  kapua-console:
+    image: kapua/kapua-console
+    ports:
+      - "8080:8080"
+    depends_on:
+      - broker
+      - db
+      - es
+      - events-broker
+
 volumes:
   mongo_data:
+  es-storage:

@@ -30,9 +30,6 @@ def create_app():
 
     return google, app
 
-create_admin()
-google, app = create_app()
-
 def start_mqtt():
     logger.info("Starting MQTT client configuration...")
     mqtt_client = configure_mqtt_client()
@@ -41,5 +38,6 @@ def start_mqtt():
     mqtt_thread_instance.start()
     logger.info("MQTT thread started")
 
-if __name__ == "__main__":
-    start_mqtt()
+create_admin()
+google, app = create_app()
+start_mqtt()

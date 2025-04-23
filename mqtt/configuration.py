@@ -1,4 +1,6 @@
 import uuid
+from time import sleep
+
 import paho.mqtt.client as mqtt
 
 import mqtt.triggers as triggers
@@ -10,22 +12,16 @@ from utils.logging import logger
 def mqtt_thread(mqtt_client: mqtt.Client):
     mqtt_client.loop_forever()
 
-# Used to configure authentication and connection with Mosquitto
+# Used to configure authentication and connection with Artemis
 def configure_mqtt_client():
-
     mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, f'{MQTT_CLIENT_ID}-{uuid.uuid4()}')
 
-    # Two-way authentication
-    mqtt_client.tls_set(
-        ca_certs='./certs/ca.crt',
-        certfile='./certs/client.crt',
-        keyfile='./certs/client.key'
-    )
+    mqtt_client.username_pw_set('kapua-sys', 'kapua-password')
 
     mqtt_client.on_connect = triggers.on_connect
     mqtt_client.on_message = triggers.on_message
     try:
-        mqtt_client.connect("mosquitto", 1883, 60)
+        mqtt_client.connect("broker", 1883, 60)
     except Exception as e:
         logger.error(f"Failed to connect to MQTT broker: {e}")
 

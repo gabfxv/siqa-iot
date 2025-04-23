@@ -1,8 +1,16 @@
-import logging
+import logging, platform
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-)
+class HostnameFilter(logging.Filter):
+    hostname = platform.node()
 
-logger = logging.getLogger(__name__)
+    def filter(self, record):
+        record.hostname = HostnameFilter.hostname
+        return True
+
+handler = logging.StreamHandler()
+handler.addFilter(HostnameFilter())
+handler.setFormatter(logging.Formatter('%(asctime)s %(hostname)s: %(message)s', datefmt='%b %d %H:%M:%S'))
+
+logger = logging.getLogger()
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
