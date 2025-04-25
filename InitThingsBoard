@@ -1,0 +1,6 @@
+FROM python:3.13-slim
+WORKDIR /app
+COPY init_thingsboard.py .
+COPY config/temperature-rule-chain.json /config/temperature-rule-chain.json
+RUN pip install tb-rest-client==4.0.0 confluent-kafka==2.10.0
+CMD ["python", "init_thingsboard.py"]

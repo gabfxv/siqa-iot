@@ -1,5 +1,4 @@
 import os
-
 from mongoengine import NotUniqueError
 
 from auth.permission import Permission

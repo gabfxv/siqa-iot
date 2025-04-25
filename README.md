@@ -27,12 +27,13 @@ docker-compose up --build --scale server=<number_of_replications> -d
 ## Technologies
 - [Python 3.13](https://www.python.org/)
 - [Flask](https://flask.palletsprojects.com/en/stable/)
-- Raspberry Pi
-- [ActiveMQ Artemis](https://activemq.apache.org/components/artemis/)
+- [Raspberry Pi](https://www.raspberrypi.com/)
 - [Docker](https://www.docker.com/)
 - [NGINX](https://nginx.org/)
-- [Kura](https://eclipse-kura.github.io/kura/docs-release-5.6/)
-- [Kapua](https://projects.eclipse.org/projects/iot.kapua)
+- [ThingsBoard](https://thingsboard.io/docs/user-guide/install/docker/)
+- [MQTT](https://mqtt.org/)
+- [Apache Kafka](https://kafka.apache.org/)
+- [Google OAuth2 Provider](https://developers.google.com/identity/protocols/oauth2)
 - Sensors
 
 ## Security

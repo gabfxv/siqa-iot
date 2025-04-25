@@ -9,7 +9,7 @@ class HostnameFilter(logging.Filter):
 
 handler = logging.StreamHandler()
 handler.addFilter(HostnameFilter())
-handler.setFormatter(logging.Formatter('%(asctime)s %(hostname)s: %(message)s', datefmt='%b %d %H:%M:%S'))
+handler.setFormatter(logging.Formatter('%(asctime)s [%(hostname)s]: %(message)s', datefmt='%b %d %H:%M:%S'))
 
 logger = logging.getLogger()
 logger.addHandler(handler)

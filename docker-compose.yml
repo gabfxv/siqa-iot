@@ -6,7 +6,7 @@ services:
       replicas: 3
     depends_on:
       - mongo
-      - broker
+      - init-thingsboard
     environment:
       - MONGO_URI=mongodb://mongo:27017
       - MONGO_DB_NAME=siqa_database
@@ -17,6 +17,7 @@ services:
       - INITIAL_ADMIN_GOOGLE_EMAIL=${INITIAL_ADMIN_GOOGLE_EMAIL}
     volumes:
       - .:/app
+      - shared-data:/shared
 
   mongo:
     image: mongo:8.0
@@ -36,61 +37,61 @@ services:
     depends_on:
       - server
 
-  db:
-    image: kapua/kapua-sql
+  kafka:
+    restart: always
+    image: bitnami/kafka:3.8.1
     ports:
-      - "8181:8181"
-      - "3306:3306"
-
-  es:
-    image: elasticsearch:8.18.0
+      - 9092:9092 #to localhost:9092 from host machine
+      - 9093 #for Kraft
+      - 9094 #to kafka:9094 from within Docker network
     environment:
-      - cluster.name=kapua-datastore
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - transport.host=_site_
-      - transport.ping_schedule=-1
-      - transport.connect_timeout=30s
-    ports:
-      - "9200:9200"
-      - "9300:9300"
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+      KAFKA_CFG_LISTENERS: "OUTSIDE://:9092,CONTROLLER://:9093,INSIDE://:9094"
+      KAFKA_CFG_ADVERTISED_LISTENERS: "OUTSIDE://localhost:9092,INSIDE://kafka:9094"
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: "INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT,CONTROLLER:PLAINTEXT"
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: "INSIDE"
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_CFG_PROCESS_ROLES: "controller,broker" #KRaft
+      KAFKA_CFG_NODE_ID: "0" #KRaft
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: "CONTROLLER" #KRaft
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: "0@kafka:9093" #KRaft
     volumes:
-      - es-storage:/usr/share/elasticsearch/data
+      - kafka-data:/bitnami
 
-  events-broker:
-    image: kapua/kapua-events-broker:1.6
+  mytb:
+    restart: always
+    image: "thingsboard/tb-postgres"
+    depends_on:
+      - kafka
     ports:
-      - "5672:5672"
-
-  broker:
-    image: kapua/kapua-broker:1.6
-    ports:
+      - "8080:9090"
       - "1883:1883"
-    depends_on:
-      - db
-      - es
-      - events-broker
+      - "7070:7070"
+      - "5683-5688:5683-5688/udp"
+    environment:
+      TB_QUEUE_TYPE: kafka
+      TB_KAFKA_SERVERS: kafka:9094
+    volumes:
+      - mytb-data:/data
+      - mytb-logs:/var/log/thingsboard
 
-  kapua-api:
-    image: kapua/kapua-api
-    ports:
-      - "8081:8080"
+  init-thingsboard:
+    build:
+      context: .
+      dockerfile: InitThingsBoard
     depends_on:
-      - broker
-      - db
-      - es
-      - events-broker
-
-  kapua-console:
-    image: kapua/kapua-console
-    ports:
-      - "8080:8080"
-    depends_on:
-      - broker
-      - db
-      - es
-      - events-broker
+      - mytb
+    volumes:
+      - ./config:/config
+      - shared-data:/shared
 
 volumes:
+  shared-data:
   mongo_data:
-  es-storage:
+  mytb-data:
+  mytb-logs:
+  kafka-data:
+    driver: local

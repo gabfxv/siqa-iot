@@ -1,0 +1,96 @@
+{
+  "ruleChain": {
+    "name": "Kafka Publisher - Temperature",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": true,
+    "debugMode": true,
+    "configuration": null,
+    "additionalInfo": {
+      "description": ""
+    }
+  },
+  "metadata": {
+    "firstNodeIndex": 0,
+    "nodes": [
+      {
+        "type": "org.thingsboard.rule.engine.filter.TbJsFilterNode",
+        "name": "Is Temperature Device",
+        "debugSettings": {
+          "failuresEnabled": false,
+          "allEnabled": true
+        },
+        "singletonMode": false,
+        "queueName": null,
+        "configuration": {
+          "scriptLang": "TBEL",
+          "jsScript": "return msg.temperature > 20;",
+          "tbelScript": "return metadata.deviceName === 'temperature';"
+        },
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 300,
+          "layoutY": 153
+        }
+      },
+      {
+        "type": "org.thingsboard.rule.engine.kafka.TbKafkaNode",
+        "name": "Kafka Publisher",
+        "debugSettings": {
+          "failuresEnabled": false,
+          "allEnabled": true
+        },
+        "singletonMode": false,
+        "queueName": null,
+        "configuration": {
+          "topicPattern": "tb.telemetry.temperature",
+          "keyPattern": null,
+          "bootstrapServers": "kafka:9094",
+          "retries": 0,
+          "batchSize": 16384,
+          "linger": 0,
+          "bufferMemory": 33554432,
+          "acks": "all",
+          "otherProperties": {},
+          "addMetadataKeyValuesAsKafkaHeaders": false,
+          "kafkaHeadersCharset": "UTF-8"
+        },
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 828,
+          "layoutY": 153
+        }
+      },
+      {
+        "type": "org.thingsboard.rule.engine.filter.TbJsFilterNode",
+        "name": "Is Telemetry",
+        "debugSettings": null,
+        "singletonMode": false,
+        "queueName": null,
+        "configuration": {
+          "scriptLang": "TBEL",
+          "jsScript": "return msg.temperature > 20;",
+          "tbelScript": "return msg.temperature != null"
+        },
+        "additionalInfo": {
+          "description": "",
+          "layoutX": 547,
+          "layoutY": 152
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 2,
+        "type": "True"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 1,
+        "type": "True"
+      }
+    ],
+    "ruleChainConnections": null
+  }
+}
