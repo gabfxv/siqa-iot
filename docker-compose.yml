@@ -1,6 +1,8 @@
 services:
   server:
-    build: .
+    build:
+      context: backend
+      dockerfile: Dockerfile
     deploy:
       mode: replicated
       replicas: 3
@@ -16,8 +18,20 @@ services:
       - INITIAL_ADMIN_NAME=${INITIAL_ADMIN_NAME}
       - INITIAL_ADMIN_GOOGLE_EMAIL=${INITIAL_ADMIN_GOOGLE_EMAIL}
     volumes:
-      - .:/app
+      - ./backend:/app
       - shared-data:/shared
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+    depends_on:
+     - server
+    deploy:
+      mode: replicated
+      replicas: 3
 
   mongo:
     image: mongo:8.0
@@ -80,13 +94,19 @@ services:
 
   init-thingsboard:
     build:
-      context: .
-      dockerfile: InitThingsBoard
+      context: things_board
+      dockerfile: Dockerfile
     depends_on:
       - mytb
     volumes:
-      - ./config:/config
       - shared-data:/shared
+
+  emulator:
+    build:
+      context: sensor-emulator
+      dockerfile: Dockerfile
+    depends_on:
+      - init-thingsboard
 
 volumes:
   shared-data:

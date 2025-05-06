@@ -1,3 +1,0 @@
-TOPICS = {
-    'tb.telemetry.temperature'
-}
